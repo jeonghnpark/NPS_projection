@@ -1,7 +1,21 @@
-# 국민연금 재정추계 모델
+# 국민연금 재정추계 모델 
+
+
+
+<div style="float: right; font-size: 0.8em; text-align: right;">
+박정현<br>
+jh70035@gmail.com<br>
+
+</div>
+
+
 
 ## 프로젝트 소개
-이 프로젝트는 국민연금의 장기 재정추계를 수행하는 파이썬 기반 모델입니다. 2023년부터 2093년까지의 국민연금 재정상태를 예측합니다.
+이 미니 프로젝트는 국민연금의 장기 재정추계를 수행하는 파이썬 기반 모델입니다. 2023년부터 2093년까지의 국민연금 재정상태를 예측합니다.
+
+본 모델은 다음 자료를 참고하여 작성되었습니다:
+- [국민연금 제5차 재정계산 결과 (2023)](https://nsp.nanet.go.kr/plan/subject/detail.do?nationalPlanControlNo=PLAN0000037347)
+
 
 ## 주요 기능
 - 인구추계 (DemographicModule)
@@ -12,14 +26,18 @@
 
 
 ## 추계 결과
-![재정추계 결과](./images/financial_projection_241745.png)
-![인구추계 결과](./images/demographic_projection_241745.png)
+본 모델의 추계 결과는 제5차 재정계산 보고서의 정보를 기반으로 하였습니다.
 
-
- 결과는 위 그래프와 같습니다. 주요 결과는 다음과 같습니다:
+### 주요 결과
 - 적립금은 2050년대 초반 최고치 도달 후 감소
 - 수지적자는 2050년대 초반부터 발생
 
+### 시각화 결과
+![재정추계 결과](./images/financial_projection_241745.png)
+*재정추계 결과 그래프*
+
+![인구추계 결과](./images/demographic_projection_241745.png)
+*인구추계 결과 그래프*
 
 
 ## 주요 매개변수
@@ -40,20 +58,12 @@
 
 ## 참고문헌
 - 국민연금 제5차 재정계산 결과 (2023)
-
 https://nsp.nanet.go.kr/plan/subject/detail.do?nationalPlanControlNo=PLAN0000037347
 
 
-## 프로젝트 구조
-.
-├── NPS_model.py           
-├── demographic_module.py  
-├── economic_module.py     
-├── finance_module.py      
-└── README.md
 
 ## 추계 실행
-results = nps.run_projection()
+```python .\NPS_model.py```
 
 
 ## 출력 결과
