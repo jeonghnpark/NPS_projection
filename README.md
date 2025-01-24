@@ -46,10 +46,10 @@ https://nsp.nanet.go.kr/plan/subject/detail.do?nationalPlanControlNo=PLAN0000037
 
 ## 프로젝트 구조
 .
-├── NPS_model.py           # 메인 모델
-├── demographic_module.py  # 인구 모듈
-├── economic_module.py     # 경제 모듈
-├── finance_module.py      # 재정/가입자/급여 모듈
+├── NPS_model.py           
+├── demographic_module.py  
+├── economic_module.py     
+├── finance_module.py      
 └── README.md
 
 ## 추계 실행
