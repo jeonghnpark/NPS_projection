@@ -18,7 +18,7 @@
 - README.md
 
 ## 테스트 결과
-![재정추계 결과](./images/financial_projection_241739.png)
+![재정추계 결과](./images/financial_projection_241745.png)
 ![인구추계 결과](./images/demographic_projection_241745.png)
 
 
