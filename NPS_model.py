@@ -4,14 +4,10 @@ from finance_module import FinanceModule, SubscriberModule, BenefitModule
 from datetime import datetime
 import pandas as pd
 
-from datetime import datetime
 import matplotlib.font_manager as fm
-
 import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
 import platform
 
-# 운영체제별 한글 폰트 설정
 system_name = platform.system()
 
 if system_name == "Windows":
@@ -20,7 +16,6 @@ elif system_name == "Darwin":  # Mac
     plt.rc("font", family="AppleGothic")
 else:  # Linux
     plt.rc("font", family="NanumGothic")
-
 
 now = datetime.now()
 timestamp = now.strftime("%d%H%M")
@@ -46,7 +41,6 @@ class NationalPensionModel:
         for year in range(self.start_year, self.end_year + 1):
             # 1. 인구추계
             population_data = self.demographic.project_population(year)
-            # demographic_results.append(population_data["indicators"])
 
             # 2. 거시경제변수 추계
             economic_vars = self.economic.project_variables(year)
@@ -92,16 +86,10 @@ class NationalPensionModel:
 nps = NationalPensionModel()
 rs = nps.run_projection()
 
-
-financial_df = pd.DataFrame(rs["financial_results"])
-demographic_df = pd.DataFrame(rs["demographic_results"])
-
-financial_df.to_csv(
-    f"financial_results_실질_{timestamp}.csv", encoding="utf-8-sig", index=False
+# 결과 저장
+pd.DataFrame(rs["financial_results"]).to_csv(
+    f"csv/financial_results_실질_{timestamp}.csv", encoding="utf-8-sig", index=False
 )
-demographic_df.to_csv(
-    f"demographic_results_실질_{timestamp}.csv", encoding="utf-8-sig", index=False
+pd.DataFrame(rs["demographic_results"]).to_csv(
+    f"csv/demographic_results_실질_{timestamp}.csv", encoding="utf-8-sig", index=False
 )
-
-print(f"재정추계 결과가 financial_results_실질_{timestamp}.csv로 저장되었습니다.")
-print(f"인구추계 결과가 demographic_results_실질_{timestamp}.csv로 저장되었습니다.")
