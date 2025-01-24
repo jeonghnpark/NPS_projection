@@ -19,6 +19,7 @@
 
 ## 테스트 결과
 ![재정추계 결과](./financial_projection_241739.png)
+![인구추계 결과](./demographic_projection_241745.png)
 
 
 테스트 결과는 위 그래프와 같습니다. 주요 결과는 다음과 같습니다:
@@ -27,17 +28,7 @@
 - 적립배율은 2054년에 1배 미만으로 하락
 
 
-## 설치 방법
-bash
-git clone [repository-url]
-cd [project-directory]
-pip install -r requirements.txt
-## 사용 방법
-python
-from NPS_model import NationalPensionModel
 
-## 모델 초기화
-nps = NationalPensionModel()
 ## 추계 실행
 results = nps.run_projection()
 
