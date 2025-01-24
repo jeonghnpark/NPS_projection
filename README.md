@@ -18,8 +18,8 @@
 - README.md
 
 ## 테스트 결과
-![재정추계 결과](./financial_projection_241739.png)
-![인구추계 결과](./demographic_projection_241745.png)
+![재정추계 결과](./images/financial_projection_241739.png)
+![인구추계 결과](./images/demographic_projection_241745.png)
 
 
 테스트 결과는 위 그래프와 같습니다. 주요 결과는 다음과 같습니다:
