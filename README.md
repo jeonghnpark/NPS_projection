@@ -10,13 +10,23 @@
 - 급여지출 추계 (BenefitModule)
 - 재정수지 추계 (FinanceModule)
 
-
 ## 프로젝트 구조
-├── NPS_model.py # 메인 모델
-├── demographic_module.py # 인구 모듈
-├── economic_module.py # 경제 모듈
-├── finance_module.py # 재정/가입자/급여 모듈
-└── README.md
+- NPS_model.py # 메인 모델
+- demographic_module.py # 인구 모듈
+- economic_module.py # 경제 모듈
+- finance_module.py # 재정/가입자/급여 모듈
+- README.md
+
+## 테스트 결과
+![재정추계 결과](./financial_projection_241739.png)
+
+
+테스트 결과는 위 그래프와 같습니다. 주요 결과는 다음과 같습니다:
+- 적립금은 2040년대 초반 최고치 도달 후 감소
+- 수지적자는 2040년대 초반부터 발생
+- 적립배율은 2054년에 1배 미만으로 하락
+
+
 ## 설치 방법
 bash
 git clone [repository-url]

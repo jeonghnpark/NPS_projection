@@ -5,6 +5,22 @@ from datetime import datetime
 import pandas as pd
 
 from datetime import datetime
+import matplotlib.font_manager as fm
+
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+import platform
+
+# 운영체제별 한글 폰트 설정
+system_name = platform.system()
+
+if system_name == "Windows":
+    plt.rc("font", family="Malgun Gothic")
+elif system_name == "Darwin":  # Mac
+    plt.rc("font", family="AppleGothic")
+else:  # Linux
+    plt.rc("font", family="NanumGothic")
+
 
 now = datetime.now()
 timestamp = now.strftime("%d%H%M")
@@ -89,3 +105,65 @@ demographic_df.to_csv(
 
 print(f"재정추계 결과가 financial_results_실질_{timestamp}.csv로 저장되었습니다.")
 print(f"인구추계 결과가 demographic_results_실질_{timestamp}.csv로 저장되었습니다.")
+
+
+# 마이너스 기호 깨짐 방지
+plt.rc("axes", unicode_minus=False)
+
+# 재정추계 결과 시각화
+plt.figure(figsize=(15, 10))
+
+# 1. 적립금 추이
+plt.subplot(2, 2, 1)
+plt.plot(financial_df["year"], financial_df["reserve_fund"] / 1_000_000_000, marker="o")
+plt.title("연도별 적립금 추이", fontsize=12)
+plt.xlabel("연도", fontsize=10)
+plt.ylabel("적립금 (조원)", fontsize=10)
+plt.grid(True)
+
+# 2. 수입-지출 추이
+plt.subplot(2, 2, 2)
+plt.plot(
+    financial_df["year"],
+    financial_df["total_revenue"] / 1_000_000_000,
+    marker="o",
+    label="총수입",
+)
+plt.plot(
+    financial_df["year"],
+    financial_df["total_expenditure"] / 1_000_000_000,
+    marker="o",
+    label="총지출",
+)
+plt.title("연도별 수입-지출 추이", fontsize=12)
+plt.xlabel("연도", fontsize=10)
+plt.ylabel("금액 (조원)", fontsize=10)
+plt.legend()
+plt.grid(True)
+
+# 3. 수지차 추이
+plt.subplot(2, 2, 3)
+plt.plot(
+    financial_df["year"],
+    financial_df["balance"] / 1_000_000_000,
+    marker="o",
+    color="green",
+)
+plt.title("연도별 수지차 추이", fontsize=12)
+plt.xlabel("연도", fontsize=10)
+plt.ylabel("금액 (조원)", fontsize=10)
+plt.grid(True)
+
+# 4. 적립률 추이
+plt.subplot(2, 2, 4)
+plt.plot(financial_df["year"], financial_df["fund_ratio"], marker="o", color="purple")
+plt.title("연도별 적립률 추이", fontsize=12)
+plt.xlabel("연도", fontsize=10)
+plt.ylabel("적립률 (%)", fontsize=10)
+plt.grid(True)
+
+plt.tight_layout()
+plt.savefig(f"financial_projection_{timestamp}.png", dpi=300, bbox_inches="tight")
+plt.close()
+
+print(f"재정추계 시각화 결과가 financial_projection_{timestamp}.png로 저장되었습니다.")
