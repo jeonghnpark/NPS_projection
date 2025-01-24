@@ -53,21 +53,6 @@ results = nps.run_projection()
 - 소득대체율: 40%
 - 수급개시연령: 65세
 
-## 기술 스택
-- Python 3.x
-- pandas
-- numpy
-
-## 시스템 요구사항
-- Python 3.8 이상
-- pandas 1.0.0 이상
-- numpy 1.18.0 이상
-
-## 라이선스
-내부용
-
-## 연락처
-[담당자 정보 추가 필요]
-
 ## 참고문헌
 - 국민연금 제5차 재정계산 결과 (2023)
+https://nsp.nanet.go.kr/plan/subject/detail.do?nationalPlanControlNo=PLAN0000037347
