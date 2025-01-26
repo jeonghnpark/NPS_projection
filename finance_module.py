@@ -316,10 +316,3 @@ class BenefitModule:
             "total_benefits_nominal": total_benefits_nominal,
             "total_benefits_real": total_benefits_real,  # 실질가치로 변환된 총급여지출
         }
-        # return {
-        #     "year": year,
-        #     "beneficiaries": beneficiaries,
-        #     "avg_benefit": avg_benefit,
-        #     "total_benefits_nominal": total_benefits_nominal,
-        #     "total_benefits_real": total_benefits_nominal,  # 실질가치 변환 필요
-        # }
