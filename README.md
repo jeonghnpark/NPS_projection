@@ -11,7 +11,7 @@ jh70035@gmail.com<br>
 
 ## 프로젝트 소개 🚀
 
-이 미니 프로젝트는 국민연금의 장기 재정추계를 수행하는 파이썬 기반 모델입니다. 
+이 미니 프로젝트는 [국민연금 제5차 재정계산 결과 (2023)](https://nsp.nanet.go.kr/plan/subject/detail.do?nationalPlanControlNo=PLAN0000037347)를 기반으로 국민연금의 장기 재정추계를 수행하는 파이썬 기반 모델입니다. 
 
 ### 주요 특징
 - **추계 기간**: 2023년 ~ 2093년 (70년)
@@ -79,11 +79,6 @@ jh70035@gmail.com<br>
 - 국민연금 제5차 재정계산 결과 (2023)
 https://nsp.nanet.go.kr/plan/subject/detail.do?nationalPlanControlNo=PLAN0000037347
 
-
-### 모델 한계점
-- 출산율 적용방식의 차이
-- 재정계산 보고서의 제한된 정보로 인한 가정 사용
-- 5차 재정계산 결과와 일부 차이 존재
 
 ## 향후 개선 계획 📈
 
