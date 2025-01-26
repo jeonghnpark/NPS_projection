@@ -34,7 +34,8 @@ class FinanceModule:
             },
         }
 
-        self.reserve_fund = 915e8  # 2023년 초기 적립금 (915조원): 단위 만원!!!
+        self.reserve_fund = 915e8  # 2023년 초기 적립금 (915조원): 단위 만원
+        self.real_reserve_fund = 915e8  # 2023년 초기 실질 적립금 (915조원): 단위 만원
 
     def project_balance(self, year, subscribers, benefits, economic_vars):
         """재정수지 추계"""
@@ -55,14 +56,14 @@ class FinanceModule:
         self.reserve_fund = self._calculate_reserve_fund(year, nominal_balance)
 
         # 보고서 결과와 비교를 위해 실질가치로 변환
-        real_reserve_fund = self.reserve_fund / cumulative_inflation
+        self.real_reserve_fund = self.reserve_fund / cumulative_inflation
 
         return {
             "year": year,
             "total_revenue": total_revenue,
             "total_expenditure": total_expenditure,
             "balance": balance,
-            "reserve_fund": self.reserve_fund,
+            "reserve_fund": self.real_reserve_fund,  # 실질 적립금
             "fund_ratio": self.reserve_fund / total_expenditure,  # 적립배율
         }
 
@@ -297,8 +298,7 @@ class BenefitModule:
         )
 
         # 3. 총급여지출 계산
-        # total_benefits_nominal = beneficiaries * avg_benefit * 12  # 첫해 대략
-        total_benefits_nominal = beneficiaries * avg_benefit  # 첫해 대략
+        total_benefits_nominal = beneficiaries * avg_benefit
 
         # 4. 실질가치 변환
         cumulative_inflation = 1.0

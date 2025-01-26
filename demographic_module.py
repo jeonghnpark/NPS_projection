@@ -105,11 +105,13 @@ class DemographicModule:
             & (prev_population_struct["age"] <= 49)
         ]["female"].sum()
 
-        total_births = fertile_women * fertility_rate / 1000  # 여성 1명당 출생아 수 ???
+        total_births = (
+            fertile_women * fertility_rate / (49 - 15 + 1)
+        )  # 합계출산율->연간 출생아수로 전환
 
-        # 출생성비 적용 (남아 51.5%, 여아 48.5%)
-        male_births = total_births * 0.515
-        female_births = total_births * 0.485
+        # 출생성비 적용
+        male_births = total_births * 0.5
+        female_births = total_births * 0.5
 
         # 4. 신생아 행 추가
         newborn_row = pd.DataFrame(
@@ -252,16 +254,35 @@ def test_demographic_module():
         results_list.append(
             {
                 "year": year,
-                "total_population": result["total_population"],
-                "working_age_population": result["working_age_population"],
-                "elderly_population": result["elderly_population"],
-                "elderly_dependency": result["elderly_dependency"],
+                "total_population": result["indicators"]["total_population"],
+                "working_age_population": result["indicators"][
+                    "working_age_population"
+                ],
+                "elderly_population": result["indicators"]["elderly_population"],
+                "elderly_dependency": result["indicators"]["elderly_dependency"],
+                "population_structure": result[
+                    "population_structure"
+                ],  # 인구구조 데이터 추가
             }
         )
 
     results_df = pd.DataFrame(results_list)
     print("\n인구추계 결과:")
     print(results_df)
+
+    import matplotlib.pyplot as plt
+
+    plt.figure(figsize=(12, 6))
+    plt.plot(
+        results_df["year"], results_df["total_population"] / 10000, "b-", linewidth=2
+    )
+    plt.title("total population(2023-2093)", fontsize=14)
+    plt.xlabel("year", fontsize=12)
+    plt.ylabel("total pupulation (10000 person)", fontsize=12)
+    plt.grid(True)
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
 
 
 if __name__ == "__main__":
