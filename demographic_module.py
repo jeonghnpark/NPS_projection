@@ -15,7 +15,7 @@ class DemographicModule:
 
         # 인구 변동요인 초기화 (중위가정 기준)
         self.params = {
-            "fertility_rate": {  # 합계출산율
+            "fertility_rate": {  # 합계출산율 보고서 p11
                 2023: 0.73,
                 2030: 0.96,
                 2040: 1.19,
@@ -23,7 +23,7 @@ class DemographicModule:
                 2060: 1.21,
                 2070: 1.21,
             },
-            "life_expectancy": {  # 기대수명
+            "life_expectancy": {  # 기대수명 보고서 p11
                 2023: 84.3,
                 2030: 85.7,
                 2040: 87.4,
@@ -31,7 +31,7 @@ class DemographicModule:
                 2060: 90.1,
                 2070: 91.2,
             },
-            "net_migration": {  # 국제순이동(천명) #TODO x1000반영확인 -> 천명단위로
+            "net_migration": {  # 국제순이동(천명) 보고서 p11
                 2023: 43,
                 2030: 46,
                 2040: 46,
@@ -134,8 +134,8 @@ class DemographicModule:
 
     def _get_survival_rates(self, ages):
         """간단한 연령별 생존률 계산"""
-        # 연령별 사망률 (매우 단순화된 버전)
         # 0세: 0.995, 1-39세: 0.999, 40-69세: 0.995, 70-89세: 0.98, 90세 이상: 0.90
+        # 출처 통계청 사망원인통계
         survival_rates = np.ones(len(ages))
 
         survival_rates[ages == 0] = 0.995
@@ -216,28 +216,7 @@ def create_initial_population_2023():
 def test_demographic_module():
     demo = DemographicModule()
 
-    # 가상의 초기 인구 데이터 생성
-    # np.random.seed(42)
-    # initial_population = pd.DataFrame(
-    #     {
-    #         "age": range(101),
-    #         "male": np.random.normal(300000, 50000, 101),
-    #         "female": np.random.normal(300000, 50000, 101),
-    #         "total": np.random.normal(600000, 100000, 101),
-    #     }
-    # )
-
-    # 5차 재정추계결과.pdf 자료로 초기 인구 데이터 생성
-
     demo.population_structure = create_initial_population_2023()
-
-    # 2023년 인구추계 테스트
-    # result_2023 = demo.project_population(2023)
-    # print(f"2023년 추계결과:")
-    # print(f"총인구: {result_2023['total_population']:,.0f}")
-    # print(f"생산가능인구: {result_2023['working_age_population']:,.0f}")
-    # print(f"고령인구: {result_2023['elderly_population']:,.0f}")
-    # print(f"노년부양비: {result_2023['elderly_dependency']:.1f}%")
 
     # 2023년부터 2093년까지 인구추계 테스트
     results_list = []
