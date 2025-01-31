@@ -48,25 +48,22 @@ class FinanceModule:
         # 3. 수지차 계산
         balance = total_revenue - total_expenditure
 
-        # # 4. 적립금 계산 (실질가치에서 명목가치로 변환)
-        # cumulative_inflation = self._get_cumulative_inflation(2023, year)
-        # nominal_balance = balance * cumulative_inflation
+        # 4. 적립금 계산 (실질가치에서 명목가치로 변환)
+        cumulative_inflation = self._get_cumulative_inflation(2023, year)
+        nominal_balance = balance * cumulative_inflation
 
-        # # 적립금은 명목가치로 관리
-        # self.reserve_fund = self._calculate_reserve_fund(year, nominal_balance)
+        # 적립금은 명목가치로 관리
+        self.reserve_fund = self._calculate_reserve_fund(year, nominal_balance)
 
-        # # 보고서 결과와 비교를 위해 실질가치로 변환
-        # self.real_reserve_fund = self.reserve_fund / cumulative_inflation
-
-        # 실질 적립금
-        self.reserve_fund = self._calculate_reserve_fund(year, balance)
+        # 보고서 결과와 비교를 위해 실질가치로 변환
+        real_reserve_fund = self.reserve_fund / cumulative_inflation
 
         return {
             "year": year,
             "total_revenue": total_revenue,
             "total_expenditure": total_expenditure,
             "balance": balance,
-            "reserve_fund": self.reserve_fund,  # 실질 적립금
+            "reserve_fund": real_reserve_fund,  # 실질 적립금
             "fund_ratio": self.reserve_fund / total_expenditure,  # 적립배율
         }
 
