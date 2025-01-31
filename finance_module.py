@@ -8,11 +8,11 @@ class FinanceModule:
         self.params = {
             "contribution_rate": 0.09,
             "nominal_investment_return": {
-                2023: 0.048,
-                2030: 0.045,
-                2040: 0.043,
-                2050: 0.043,
-                2060: 0.043,
+                2023: 0.049,
+                2030: 0.049,
+                2040: 0.046,
+                2050: 0.045,
+                2060: 0.045,
             },
             "inflation_rate": {  # 물가상승률 (보고서 p.12 참조)
                 2023: 0.022,
