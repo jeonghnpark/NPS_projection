@@ -50,7 +50,10 @@ class NationalPensionModel:
         for year in range(self.start_year, self.end_year + 1):
             # 1. 인구추계
             population_data = self.demographic.project_population(year)
-
+            if year < 2025:
+                population_data["population_structure"].to_csv(
+                    f"csv/pop{year}.csv", index=False
+                )
             # 2. 거시경제변수 추계
             economic_vars = self.economic.project_variables(year)
 

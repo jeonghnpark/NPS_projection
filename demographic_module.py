@@ -41,14 +41,6 @@ class DemographicModule:
             },
         }
 
-    def load_initial_population(self, population_data_path):
-        """초기 인구 데이터 로드
-        함수 활용안되고 있음
-        """
-        # 연령별/성별 인구 구조 데이터 로드
-        # self.population_structure = pd.read_csv(population_data_path)
-        pass
-
     def project_population(self, year):
         """특정 연도의 인구추계"""
         # 1. 연령별/성별 인구구조 계산
@@ -117,9 +109,9 @@ class DemographicModule:
         newborn_row = pd.DataFrame(
             {
                 "age": [0],
+                "total": [male_births + female_births],
                 "male": [male_births],
                 "female": [female_births],
-                "total": [male_births + female_births],
             }
         )
 
@@ -132,7 +124,7 @@ class DemographicModule:
 
         # 6. 최종 인구구조 생성
         population_structure = pd.concat(
-            [newborn_row, prev_population_struct[prev_population_struct["age"] <= 100]]
+            [newborn_row, prev_population_struct[prev_population_struct["age"] <= 200]]
         )
         population_structure["total"] = (
             population_structure["male"] + population_structure["female"]
@@ -188,8 +180,8 @@ def create_initial_population_2023():
             {
                 "age": age,
                 "total": young_pop_per_age,
-                "male": young_pop_per_age * 0.515,  # 성비 가정
-                "female": young_pop_per_age * 0.485,
+                "male": young_pop_per_age * 0.5,  # 성비 가정
+                "female": young_pop_per_age * 0.5,
             }
         )
 
@@ -200,8 +192,8 @@ def create_initial_population_2023():
             {
                 "age": age,
                 "total": working_pop_per_age,
-                "male": working_pop_per_age * 0.505,
-                "female": working_pop_per_age * 0.495,
+                "male": working_pop_per_age * 0.5,
+                "female": working_pop_per_age * 0.5,
             }
         )
 
@@ -212,8 +204,8 @@ def create_initial_population_2023():
             {
                 "age": age,
                 "total": elderly_pop_per_age,
-                "male": elderly_pop_per_age * 0.45,  # 고령층 성비 반영
-                "female": elderly_pop_per_age * 0.55,
+                "male": elderly_pop_per_age * 0.5,  # 고령층 성비 반영
+                "female": elderly_pop_per_age * 0.5,
             }
         )
 
