@@ -39,32 +39,63 @@ class FinanceModule:
 
     def project_balance(self, year, subscribers, benefits, economic_vars):
         """재정수지 추계"""
-        # 1. 수입 추계
-        total_revenue = self._calculate_total_revenue(year, subscribers, economic_vars)
+        # # 1. 수입 추계
+        # total_revenue = self._calculate_total_revenue(year, subscribers, economic_vars)
+        # # 2. 지출 추계
+        # total_expenditure = self._calculate_total_expenditure(year, benefits)
 
-        # 2. 지출 추계
-        total_expenditure = self._calculate_total_expenditure(year, benefits)
+        # # 3. 수지차 계산
+        # balance = total_revenue - total_expenditure
 
-        # 3. 수지차 계산
-        balance = total_revenue - total_expenditure
+        # 1. 수입 추계 (명목)
+        nominal_revenue = self._calculate_total_revenue(
+            year, subscribers, economic_vars
+        )
+        # 2. 지출 추계 (명목)
+        nominal_expenditure = self._calculate_total_expenditure(year, benefits)
 
-        # 4. 적립금 계산 (실질가치에서 명목가치로 변환)
-        cumulative_inflation = self._get_cumulative_inflation(2023, year)
-        nominal_balance = balance * cumulative_inflation
+        # 3. 수지차 계산 (명목)
+        nominal_balance = nominal_revenue - nominal_expenditure
 
-        # 적립금은 명목가치로 관리
+        # 4. 적립금 계산 (명목)
         self.reserve_fund = self._calculate_reserve_fund(year, nominal_balance)
 
-        # 보고서 결과와 비교를 위해 실질가치로 변환
+        # 5. 실질가치 변환
+        cumulative_inflation = self._get_cumulative_inflation(2023, year)
+        real_revenue = nominal_revenue / cumulative_inflation
+        real_expenditure = nominal_expenditure / cumulative_inflation
+        real_balance = nominal_balance / cumulative_inflation
         real_reserve_fund = self.reserve_fund / cumulative_inflation
 
+        # # 4. 적립금 계산 (실질가치에서 명목가치로 변환)
+        # cumulative_inflation = self._get_cumulative_inflation(2023, year)
+        # nominal_balance = balance * cumulative_inflation
+
+        # # 적립금은 명목가치로 관리
+        # self.reserve_fund = self._calculate_reserve_fund(year, nominal_balance)
+
+        # # 보고서 결과와 비교를 위해 실질가치로 변환
+        # real_reserve_fund = self.reserve_fund / cumulative_inflation
+
+        # return {
+        #     "year": year,
+        #     "total_revenue": total_revenue,
+        #     "total_expenditure": total_expenditure,
+        #     "balance": balance,
+        #     "reserve_fund": real_reserve_fund,  # 실질 적립금
+        #     "fund_ratio": self.reserve_fund / total_expenditure,  # 적립배율
+        # }
         return {
             "year": year,
-            "total_revenue": total_revenue,
-            "total_expenditure": total_expenditure,
-            "balance": balance,
-            "reserve_fund": real_reserve_fund,  # 실질 적립금
-            "fund_ratio": self.reserve_fund / total_expenditure,  # 적립배율
+            "nominal_revenue": nominal_revenue,
+            "real_revenue": real_revenue,
+            "nominal_expenditure": nominal_expenditure,
+            "real_expenditure": real_expenditure,
+            "nominal_balance": nominal_balance,
+            "real_balance": real_balance,
+            "nominal_reserve_fund": self.reserve_fund,
+            "real_reserve_fund": real_reserve_fund,
+            "fund_ratio": self.reserve_fund / nominal_expenditure,
         }
 
     def _get_cumulative_inflation(self, base_year, target_year):
@@ -258,6 +289,14 @@ class BenefitModule:
             return rates[-1]
         return np.interp(year, years, rates)
 
+    def _get_cumulative_inflation(self, base_year, target_year):
+        """기준연도 대비 목표연도까지의 누적 물가상승률 계산"""
+        cumulative = 1.0
+        for year in range(base_year + 1, target_year + 1):
+            inflation_rate = self._get_inflation_rate(year)
+            cumulative *= 1 + inflation_rate
+        return cumulative
+
     def _get_benefit_rate(self, year):
         """특정 연도의 수급률 반환"""
         years = sorted(self.params["benefit_rate"].keys())
@@ -285,34 +324,29 @@ class BenefitModule:
         benefit_rate = self._get_benefit_rate(year)
         beneficiaries = elderly_pop * benefit_rate
 
-        # 2. 평균급여액 계산
+        # 2. 평균급여액 계산 (명목)
         avg_insured_period = self._get_avg_insured_period(year)
         avg_income = (
             subscribers_data["total_income_nominal"]
             / subscribers_data["total_subscribers"]
         )
         avg_benefit = (
-            avg_income
-            * self.params["income_replacement"]
-            * (avg_insured_period / 40)  # 40년 만기 기준
+            avg_income * self.params["income_replacement"] * (avg_insured_period / 40)
         )
 
-        # 3. 총급여지출 계산
+        # 3. 총급여지출 계산 (명목)
         total_benefits_nominal = beneficiaries * avg_benefit
 
         # 4. 실질가치 변환
-        cumulative_inflation = 1.0
-        base_year = 2023
-        for y in range(base_year + 1, year + 1):
-            inflation_rate = self._get_inflation_rate(y)
-            cumulative_inflation *= 1 + inflation_rate
-
+        cumulative_inflation = self._get_cumulative_inflation(2023, year)
         total_benefits_real = total_benefits_nominal / cumulative_inflation
+        avg_benefit_real = avg_benefit / cumulative_inflation
 
         return {
             "year": year,
             "beneficiaries": beneficiaries,
-            "avg_benefit": avg_benefit,
+            "avg_benefit_nominal": avg_benefit,
+            "avg_benefit_real": avg_benefit_real,
             "total_benefits_nominal": total_benefits_nominal,
-            "total_benefits_real": total_benefits_real,  # 실질가치로 변환된 총급여지출
+            "total_benefits_real": total_benefits_real,
         }

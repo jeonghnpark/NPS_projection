@@ -88,7 +88,6 @@ class NationalPensionModel:
 
             # print(financial_status)
             results.append(financial_status)
-
         return {
             "financial_results": results,
             "demographic_results": demographic_results,
@@ -100,5 +99,5 @@ rs = nps.run_projection()
 
 
 save_results_to_csv(rs)
-create_financial_plots(rs)
-create_demographic_plots(rs)
+# create_financial_plots(rs)
+# create_demographic_plots(rs)
