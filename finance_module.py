@@ -14,7 +14,7 @@ class FinanceModule:
                 2050: 0.045,
                 2060: 0.045,
             },
-            "inflation_rate": {  # 물가상승률 (보고서 p.12 참조)
+            "inflation_rate": {
                 2023: 0.022,
                 2024: 0.022,
                 2025: 0.022,
