@@ -39,52 +39,24 @@ class FinanceModule:
 
     def project_balance(self, year, subscribers, benefits, economic_vars):
         """재정수지 추계"""
-        # # 1. 수입 추계
-        # total_revenue = self._calculate_total_revenue(year, subscribers, economic_vars)
-        # # 2. 지출 추계
-        # total_expenditure = self._calculate_total_expenditure(year, benefits)
 
-        # # 3. 수지차 계산
-        # balance = total_revenue - total_expenditure
+        # 1. 실질 수입/지출 추계
+        real_revenue = self._calculate_total_revenue(year, subscribers, economic_vars)
+        real_expenditure = self._calculate_total_expenditure(year, benefits)
 
-        # 1. 수입 추계 (명목)
-        nominal_revenue = self._calculate_total_revenue(
-            year, subscribers, economic_vars
-        )
-        # 2. 지출 추계 (명목)
-        nominal_expenditure = self._calculate_total_expenditure(year, benefits)
+        # 2. 실질 수지차 계산
+        real_balance = real_revenue - real_expenditure
 
-        # 3. 수지차 계산 (명목)
-        nominal_balance = nominal_revenue - nominal_expenditure
+        # 3. 명목가치 변환
+        cumulative_inflation = self._get_cumulative_inflation(2023, year)
+        nominal_revenue = real_revenue * cumulative_inflation
+        nominal_expenditure = real_expenditure * cumulative_inflation
+        nominal_balance = real_balance * cumulative_inflation
 
         # 4. 적립금 계산 (명목)
         self.reserve_fund = self._calculate_reserve_fund(year, nominal_balance)
-
-        # 5. 실질가치 변환
-        cumulative_inflation = self._get_cumulative_inflation(2023, year)
-        real_revenue = nominal_revenue / cumulative_inflation
-        real_expenditure = nominal_expenditure / cumulative_inflation
-        real_balance = nominal_balance / cumulative_inflation
         real_reserve_fund = self.reserve_fund / cumulative_inflation
 
-        # # 4. 적립금 계산 (실질가치에서 명목가치로 변환)
-        # cumulative_inflation = self._get_cumulative_inflation(2023, year)
-        # nominal_balance = balance * cumulative_inflation
-
-        # # 적립금은 명목가치로 관리
-        # self.reserve_fund = self._calculate_reserve_fund(year, nominal_balance)
-
-        # # 보고서 결과와 비교를 위해 실질가치로 변환
-        # real_reserve_fund = self.reserve_fund / cumulative_inflation
-
-        # return {
-        #     "year": year,
-        #     "total_revenue": total_revenue,
-        #     "total_expenditure": total_expenditure,
-        #     "balance": balance,
-        #     "reserve_fund": real_reserve_fund,  # 실질 적립금
-        #     "fund_ratio": self.reserve_fund / total_expenditure,  # 적립배율
-        # }
         return {
             "year": year,
             "nominal_revenue": nominal_revenue,
@@ -96,6 +68,8 @@ class FinanceModule:
             "nominal_reserve_fund": self.reserve_fund,
             "real_reserve_fund": real_reserve_fund,
             "fund_ratio": self.reserve_fund / nominal_expenditure,
+            "nominal_gdp": economic_vars["nominal_gdp"],
+            "real_gdp": economic_vars["real_gdp"],
         }
 
     def _get_cumulative_inflation(self, base_year, target_year):
@@ -213,8 +187,14 @@ class SubscriberModule:
     def project_subscribers(self, year, population_structure):
         """가입자 추계"""
         subscribers = {}
-        total_income_nominal = 0
         total_income_real = 0
+
+        # 물가상승률은 한 번만 계산
+        cumulative_inflation = 1.0
+        base_year = 2023
+        for y in range(base_year + 1, year + 1):
+            inflation_rate = self._get_inflation_rate(y)
+            cumulative_inflation *= 1 + inflation_rate
 
         for age_group, rate in self.params["participation_rate"].items():
             # 해당 연령대 인구
@@ -226,18 +206,12 @@ class SubscriberModule:
             # 가입자 수 계산
             subscribers[age_group] = age_pop * rate
 
-            # 소득 계산
+            # 실질 소득 계산 (2023년 기준 실질가치)
             avg_income = self.params["avg_income"][age_group]
-            total_income_nominal += subscribers[age_group] * avg_income * 12
+            total_income_real += subscribers[age_group] * avg_income * 12
 
-            # 실질가치 변환을 위한 물가상승률 적용
-            cumulative_inflation = 1.0
-            base_year = 2023
-            for y in range(base_year + 1, year + 1):
-                inflation_rate = self._get_inflation_rate(y)
-                cumulative_inflation *= 1 + inflation_rate
-
-            total_income_real = total_income_nominal / cumulative_inflation
+        # 모든 연령대의 실질소득 합계를 구한 후 명목가치로 변환
+        total_income_nominal = total_income_real * cumulative_inflation
 
         return {
             "year": year,
@@ -324,28 +298,29 @@ class BenefitModule:
         benefit_rate = self._get_benefit_rate(year)
         beneficiaries = elderly_pop * benefit_rate
 
-        # 2. 평균급여액 계산 (명목)
+        # 2. 평균급여액 계산 (실질가치 기준)
         avg_insured_period = self._get_avg_insured_period(year)
-        avg_income = (
-            subscribers_data["total_income_nominal"]
+        avg_income_real = (
+            subscribers_data["total_income_real"]
             / subscribers_data["total_subscribers"]
         )
-        avg_benefit = (
-            avg_income * self.params["income_replacement"] * (avg_insured_period / 40)
+        avg_benefit_real = (
+            avg_income_real
+            * self.params["income_replacement"]
+            * (avg_insured_period / 40)
         )
+        # 3. 실질 총급여지출 계산
+        total_benefits_real = beneficiaries * avg_benefit_real
 
-        # 3. 총급여지출 계산 (명목)
-        total_benefits_nominal = beneficiaries * avg_benefit
-
-        # 4. 실질가치 변환
+        # 4. 명목가치 변환
         cumulative_inflation = self._get_cumulative_inflation(2023, year)
-        total_benefits_real = total_benefits_nominal / cumulative_inflation
-        avg_benefit_real = avg_benefit / cumulative_inflation
+        total_benefits_nominal = total_benefits_real * cumulative_inflation
+        avg_benefit_nominal = avg_benefit_real * cumulative_inflation
 
         return {
             "year": year,
             "beneficiaries": beneficiaries,
-            "avg_benefit_nominal": avg_benefit,
+            "avg_benefit_nominal": avg_benefit_nominal,
             "avg_benefit_real": avg_benefit_real,
             "total_benefits_nominal": total_benefits_nominal,
             "total_benefits_real": total_benefits_real,

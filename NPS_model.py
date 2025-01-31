@@ -99,5 +99,5 @@ rs = nps.run_projection()
 
 
 save_results_to_csv(rs)
-# create_financial_plots(rs)
-# create_demographic_plots(rs)
+create_financial_plots(rs)
+create_demographic_plots(rs)

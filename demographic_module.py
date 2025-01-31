@@ -173,39 +173,92 @@ def create_initial_population_2023():
     # 연령별 인구 분포 (더 세분화된 데이터가 필요)
     population_structure = []
 
-    # 0-17세 인구 분포
-    young_pop_per_age = age_groups["under_18"] * 10000 / 18  # 만명을 명으로 변환
+    # # 0-17세 인구 분포
+    # young_pop_per_age = age_groups["under_18"] * 10000 / 18  # 만명을 명으로 변환
+    # for age in range(18):
+    #     population_structure.append(
+    #         {
+    #             "age": age,
+    #             "total": young_pop_per_age,
+    #             "male": young_pop_per_age * 0.5,  # 성비 가정
+    #             "female": young_pop_per_age * 0.5,
+    #         }
+    #     )
+
+    # # 18-64세 인구 분포
+    # working_pop_per_age = age_groups["18_64"] * 10000 / 47
+    # for age in range(18, 65):
+    #     population_structure.append(
+    #         {
+    #             "age": age,
+    #             "total": working_pop_per_age,
+    #             "male": working_pop_per_age * 0.5,
+    #             "female": working_pop_per_age * 0.5,
+    #         }
+    #     )
+
+    # # 65세 이상 인구 분포
+    # elderly_pop_per_age = age_groups["65_plus"] * 10000 / 36  # 65-100세 가정
+    # for age in range(65, 101):
+    #     population_structure.append(
+    #         {
+    #             "age": age,
+    #             "total": elderly_pop_per_age,
+    #             "male": elderly_pop_per_age * 0.5,  # 고령층 성비 반영
+    #             "female": elderly_pop_per_age * 0.5,
+    #         }
+    #     )
+
+    ######  연령대별 보다 현실적인 인구 구성
+    young_total = age_groups["under_18"] * 10000  # 만명을 명으로 변환
     for age in range(18):
+        weight = 0.8 + (age / 17) * 0.4  # 0세: 0.8, 17세: 1.2로 선형 증가
+        pop_at_age = (
+            young_total * weight / sum([0.8 + (a / 17) * 0.4 for a in range(18)])
+        )
         population_structure.append(
             {
                 "age": age,
-                "total": young_pop_per_age,
-                "male": young_pop_per_age * 0.5,  # 성비 가정
-                "female": young_pop_per_age * 0.5,
+                "total": pop_at_age,
+                "male": pop_at_age * 0.51,
+                "female": pop_at_age * 0.49,
             }
         )
 
-    # 18-64세 인구 분포
-    working_pop_per_age = age_groups["18_64"] * 10000 / 47
+    # 18-64세 인구 분포 (40-50대가 가장 많음)
+    working_total = age_groups["18_64"] * 10000
     for age in range(18, 65):
+        if 40 <= age <= 55:  # 40-55세는 더 높은 비중
+            weight = 1.3
+        else:
+            weight = 0.8
+        pop_at_age = (
+            working_total * weight / (0.8 * 32 + 1.3 * 15)
+        )  # 32년은 0.8비중, 15년은 1.3비중
         population_structure.append(
             {
                 "age": age,
-                "total": working_pop_per_age,
-                "male": working_pop_per_age * 0.5,
-                "female": working_pop_per_age * 0.5,
+                "total": pop_at_age,
+                "male": pop_at_age * 0.5,
+                "female": pop_at_age * 0.5,
             }
         )
 
-    # 65세 이상 인구 분포
-    elderly_pop_per_age = age_groups["65_plus"] * 10000 / 36  # 65-100세 가정
+    # 65세 이상 인구 분포 (초기에 높고 점차 감소)
+    elderly_total = age_groups["65_plus"] * 10000
     for age in range(65, 101):
+        weight = (
+            2.0 if age < 75 else (1.0 if age < 85 else 0.5)
+        )  # 65-74세, 75-84세, 85세 이상 구분
+        pop_at_age = (
+            elderly_total * weight / (2.0 * 10 + 1.0 * 10 + 0.5 * 16)
+        )  # 각 구간별 연수 고려
         population_structure.append(
             {
                 "age": age,
-                "total": elderly_pop_per_age,
-                "male": elderly_pop_per_age * 0.5,  # 고령층 성비 반영
-                "female": elderly_pop_per_age * 0.5,
+                "total": pop_at_age,
+                "male": pop_at_age * 0.45,
+                "female": pop_at_age * 0.55,
             }
         )
 
