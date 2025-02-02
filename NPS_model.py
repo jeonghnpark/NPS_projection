@@ -48,16 +48,13 @@ class NationalPensionModel:
         demographic_results = []  # 인구지표 저장용
 
         for year in range(self.start_year, self.end_year + 1):
-            # 1. 인구추계
+            # 인구추계
             population_data = self.demographic.project_population(year)
-            # if year < 2025:
-            #     population_data["population_structure"].to_csv(
-            #         f"csv/pop{year}.csv", index=False
-            #     )
-            # 2. 거시경제변수 추계
+
+            # 거시경제변수 추계
             economic_vars = self.economic.project_variables(year)
 
-            # 3. 가입자 추계
+            # 가입자 추계
             subscribers = self.subscriber.project_subscribers(
                 year, population_data["population_structure"]
             )
@@ -74,19 +71,18 @@ class NationalPensionModel:
 
             demographic_results.append(demographic_data)
 
-            # 4. 급여지출 추계
+            # 급여지출 추계
             benefits = self.benefit.project_benefits(
                 year,
                 population_data["population_structure"],  # 인구구조 데이터 추가
                 subscribers,
             )
 
-            # 5. 재정수지 추계
+            # 재정수지 추계
             financial_status = self.finance.project_balance(
                 year, subscribers, benefits, economic_vars
             )
 
-            # print(financial_status)
             results.append(financial_status)
         return {
             "financial_results": results,

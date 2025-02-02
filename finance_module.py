@@ -185,7 +185,7 @@ class SubscriberModule:
         return np.interp(year, years, rates)
 
     def project_subscribers(self, year, population_structure):
-        """가입자 추계"""
+
         subscribers = {}
         total_income_real = 0
 
@@ -224,7 +224,7 @@ class SubscriberModule:
 
 class BenefitModule:
     def __init__(self):
-        """급여모듈 초기화"""
+
         self.params = {
             "income_replacement": 0.40,  # 소득대체율 40%
             "avg_insured_period": {  # 평균가입기간
@@ -241,7 +241,7 @@ class BenefitModule:
                 2050: 0.750,
                 2060: 0.800,
             },
-            "inflation_rate": {  # 물가상승률 (보고서 p.12 참조)
+            "inflation_rate": {  # 물가상승률 (보고서 p.12)
                 2023: 0.022,
                 2024: 0.022,
                 2025: 0.022,
@@ -255,7 +255,7 @@ class BenefitModule:
         }
 
     def _get_inflation_rate(self, year):  # subscriber와 중복됨 개선필요
-        """특정 연도의 물가상승률 반환"""
+
         years = sorted(self.params["inflation_rate"].keys())
         rates = [self.params["inflation_rate"][y] for y in years]
 
@@ -264,7 +264,7 @@ class BenefitModule:
         return np.interp(year, years, rates)
 
     def _get_cumulative_inflation(self, base_year, target_year):
-        """기준연도 대비 목표연도까지의 누적 물가상승률 계산"""
+
         cumulative = 1.0
         for year in range(base_year + 1, target_year + 1):
             inflation_rate = self._get_inflation_rate(year)
@@ -272,7 +272,7 @@ class BenefitModule:
         return cumulative
 
     def _get_benefit_rate(self, year):
-        """특정 연도의 수급률 반환"""
+
         years = sorted(self.params["benefit_rate"].keys())
         rates = [self.params["benefit_rate"][y] for y in years]
 
@@ -281,7 +281,7 @@ class BenefitModule:
         return np.interp(year, years, rates)
 
     def _get_avg_insured_period(self, year):
-        """특정 연도의 평균가입기간 반환"""
+
         years = sorted(self.params["avg_insured_period"].keys())
         periods = [self.params["avg_insured_period"][y] for y in years]
 
@@ -290,15 +290,15 @@ class BenefitModule:
         return np.interp(year, years, periods)
 
     def project_benefits(self, year, population_structure, subscribers_data):
-        """급여지출 추계"""
-        # 1. 수급자 수 추계
+
+        # 수급자 수 추계
         elderly_pop = population_structure[population_structure["age"] >= 65][
             "total"
         ].sum()
         benefit_rate = self._get_benefit_rate(year)
         beneficiaries = elderly_pop * benefit_rate
 
-        # 2. 평균급여액 계산 (실질가치 기준)
+        # 평균급여액 계산 (실질가치 기준)
         avg_insured_period = self._get_avg_insured_period(year)
         avg_income_real = (
             subscribers_data["total_income_real"]
@@ -309,10 +309,10 @@ class BenefitModule:
             * self.params["income_replacement"]
             * (avg_insured_period / 40)
         )
-        # 3. 실질 총급여지출 계산
+        # 실질 총급여지출 계산
         total_benefits_real = beneficiaries * avg_benefit_real
 
-        # 4. 명목가치 변환
+        # 명목가치 변환
         cumulative_inflation = self._get_cumulative_inflation(2023, year)
         total_benefits_nominal = total_benefits_real * cumulative_inflation
         avg_benefit_nominal = avg_benefit_real * cumulative_inflation

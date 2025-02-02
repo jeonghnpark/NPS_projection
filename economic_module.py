@@ -42,25 +42,24 @@ class EconomicModule:
             },
         }
 
-        # 기준연도(2023) 경제지표
         self.base_values = {
             "nominal_gdp": 2100e12,  # 2023년 명목 GDP (2100조원)
             "nominal_wage": 3.85e6,  # 2023년 월평균 임금 (385만원)
         }
 
     def project_variables(self, year):
-        """특정 연도의 경제변수 추계"""
-        # 1. 성장률 추계
+
+        # 성장률 추계
         gdp_growth = self._get_gdp_growth_rate(year)
         real_wage_growth = self._get_wage_growth_rate(year)
         inflation = self._get_inflation_rate(year)
         nominal_wage_growth = self._get_nominal_wage_growth_rate(year)
 
-        # 2. GDP 추계 (실질, 명목)
+        # GDP 추계 (실질, 명목)
         real_gdp = self._calculate_real_gdp(year)
         nominal_gdp = self._calculate_nominal_gdp(year)
 
-        # 3. 임금 추계 (실질, 명목)
+        # 임금 추계 (실질, 명목)
         real_wage = self._calculate_real_wage(year)
         nominal_wage = self._calculate_nominal_wage(year)
 
@@ -77,7 +76,7 @@ class EconomicModule:
         }
 
     def _get_gdp_growth_rate(self, year):
-        """특정 연도의 실질 GDP 성장률 반환"""
+
         years = sorted(self.params["gdp_growth_rate"].keys())
         rates = [self.params["gdp_growth_rate"][y] for y in years]
 
@@ -86,7 +85,7 @@ class EconomicModule:
         return np.interp(year, years, rates)
 
     def _get_wage_growth_rate(self, year):
-        """특정 연도의 실질임금상승률 반환"""
+
         years = sorted(self.params["wage_growth_rate"].keys())
         rates = [self.params["wage_growth_rate"][y] for y in years]
 
@@ -95,7 +94,7 @@ class EconomicModule:
         return np.interp(year, years, rates)
 
     def _get_inflation_rate(self, year):
-        """특정 연도의 물가상승률 반환"""
+
         years = sorted(self.params["inflation_rate"].keys())
         rates = [self.params["inflation_rate"][y] for y in years]
 
@@ -104,7 +103,7 @@ class EconomicModule:
         return np.interp(year, years, rates)
 
     def _get_nominal_wage_growth_rate(self, year):
-        """특정 연도의 명목임금상승률 반환"""
+
         years = sorted(self.params["nominal_wage_growth_rate"].keys())
         rates = [self.params["nominal_wage_growth_rate"][y] for y in years]
 
@@ -113,7 +112,7 @@ class EconomicModule:
         return np.interp(year, years, rates)
 
     def _calculate_real_gdp(self, year):
-        """실질 GDP 계산"""
+
         base_year = 2023
         real_gdp = self.base_values["nominal_gdp"]
 
@@ -124,7 +123,7 @@ class EconomicModule:
         return real_gdp
 
     def _calculate_nominal_gdp(self, year):
-        """명목 GDP 계산"""
+
         real_gdp = self._calculate_real_gdp(year)
         base_year = 2023
         inflation_factor = 1.0
@@ -136,7 +135,7 @@ class EconomicModule:
         return real_gdp * inflation_factor
 
     def _calculate_real_wage(self, year):
-        """실질임금 계산"""
+
         base_year = 2023
         real_wage = self.base_values["nominal_wage"]
 
@@ -147,7 +146,7 @@ class EconomicModule:
         return real_wage
 
     def _calculate_nominal_wage(self, year):
-        """명목임금 계산"""
+
         base_year = 2023
         nominal_wage = self.base_values["nominal_wage"]
 

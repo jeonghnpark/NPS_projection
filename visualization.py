@@ -1,6 +1,14 @@
 from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.font_manager as fm
+
+# 한글 폰트 설정
+plt.rcParams["font.family"] = "Malgun Gothic"  # 윈도우의 경우
+# plt.rcParams['font.family'] = 'AppleGothic'  # macOS의 경우
+plt.rcParams["axes.unicode_minus"] = False  # 마이너스 기호 깨짐 방지
 
 now = datetime.now()
 timestamp = now.strftime("%d%H%M")
@@ -39,7 +47,7 @@ def create_financial_plots(rs):
     plt.grid(True)
     plt.tight_layout()
     plt.savefig(
-        f"images/nps_reserve_fund_{timestamp}.png", dpi=300, bbox_inches="tight"
+        f"images/data/nps_reserve_fund_{timestamp}.png", dpi=300, bbox_inches="tight"
     )
     plt.close()
 
@@ -65,7 +73,9 @@ def create_financial_plots(rs):
     plt.grid(True)
     plt.tight_layout()
     plt.savefig(
-        f"images/nps_revenue_expenditure_{timestamp}.png", dpi=300, bbox_inches="tight"
+        f"images/data/nps_revenue_expenditure_{timestamp}.png",
+        dpi=300,
+        bbox_inches="tight",
     )
     plt.close()
 
@@ -83,7 +93,9 @@ def create_financial_plots(rs):
     plt.ylabel("금액 (조원)", fontsize=10)
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f"images/nps_balance_{timestamp}.png", dpi=300, bbox_inches="tight")
+    plt.savefig(
+        f"images/data/nps_balance_{timestamp}.png", dpi=300, bbox_inches="tight"
+    )
     plt.close()
 
     # 4. 적립률 추이
@@ -97,7 +109,9 @@ def create_financial_plots(rs):
     plt.ylabel("적립률 (%)", fontsize=10)
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f"images/nps_fund_ratio_{timestamp}.png", dpi=300, bbox_inches="tight")
+    plt.savefig(
+        f"images/data/nps_fund_ratio_{timestamp}.png", dpi=300, bbox_inches="tight"
+    )
     plt.close()
 
     # 5. gdp대비 급여지출 추이
@@ -114,7 +128,7 @@ def create_financial_plots(rs):
     plt.ylabel("GDP 대비 비중 (%)", fontsize=10)
     plt.grid(True)
     plt.savefig(
-        f"images/nps_gdp_expenditure_{timestamp}.png", dpi=300, bbox_inches="tight"
+        f"images/data/nps_gdp_expenditure_{timestamp}.png", dpi=300, bbox_inches="tight"
     )
     plt.close()
 
@@ -166,8 +180,149 @@ def create_demographic_plots(rs):
 
     plt.tight_layout()
     plt.savefig(
-        f"images/nps_demographic_indicators_{timestamp}.png",
+        f"images/data/nps_demographic_indicators_{timestamp}.png",
         dpi=300,
         bbox_inches="tight",
     )
     plt.close()
+
+
+import numpy as np
+import seaborn as sns
+
+
+def create_simulation_visualizations(df):
+    # 1. 히트맵: 보험료율과 소득대체율에 따른 최대적립금
+    plt.figure(figsize=(12, 8))
+    pivot_max_reserve = df.pivot(
+        index="contribution_rate", columns="income_replacement", values="max_reserve"
+    )
+    sns.heatmap(pivot_max_reserve, cmap="YlOrRd", annot=True, fmt=".0f")
+    plt.title("Maximum Reserve Fund by Contribution Rate and Income Replacement Rate")
+    plt.xlabel("Income Replacement Rate (%)")
+    plt.ylabel("Contribution Rate (%)")
+    plt.tight_layout()
+    plt.savefig("images/heatmap_max_reserve.png")
+    plt.close()
+
+    # 2. 라인 플롯: 보험료율별 기금소진연도
+    plt.figure(figsize=(12, 6))
+    for rate in df["contribution_rate"].unique():
+        data = df[df["contribution_rate"] == rate]
+        plt.plot(
+            data["income_replacement"],
+            data["depletion_year"],
+            label=f"Contribution {rate}%",
+            marker="o",
+        )
+    plt.title("Depletion Year by Income Replacement Rate")
+    plt.xlabel("Income Replacement Rate (%)")
+    plt.ylabel("Depletion Year")
+    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig("images/lineplot_depletion.png")
+    plt.close()
+
+    # 2. 라인 플롯: 보험료율 vs 기금적자연도, 기금소진연도
+    plt.figure(figsize=(12, 6))
+    data = df[df["income_replacement"] == 40]
+    plt.plot(
+        data["contribution_rate"],
+        data["first_deficit_year"],
+        label=f"첫 적자 연도 - 소득대체율 {40}%",
+        marker="o",
+    )
+    plt.plot(
+        data["contribution_rate"],
+        data["depletion_year"],
+        label=f"기금 소진 연도 - 소득대체율 {40}%",
+        marker="x",
+    )
+    plt.title("보험료율에 따른 적자 전환 및 기금 소진 연도")
+    plt.xlabel("보험료율 (%)")
+    plt.ylabel("연도")
+    plt.yticks(
+        np.arange(
+            min(data["first_deficit_year"].min(), data["depletion_year"].min()),
+            max(data["first_deficit_year"].max(), data["depletion_year"].max()) + 1,
+            5,
+        )
+    )
+    plt.legend(loc="best")  # 그래프 안에 legend를 표시
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig("images/lineplot_deficit_depletion_by_contribution.png")
+    plt.close()
+
+    # 2. 라인 플롯: 소득대체율 vs 기금적자연도, 기금 소진연도
+    plt.figure(figsize=(12, 6))
+    data = df[df["contribution_rate"] == 9]  # 시각화를 위한 고정된 보험료율 가정
+    plt.plot(
+        data["income_replacement"],
+        data["first_deficit_year"],
+        label=f"첫 적자 연도 - 보험료율 {9}%",
+        marker="o",
+    )
+    plt.plot(
+        data["income_replacement"],
+        data["depletion_year"],
+        label=f"기금 소진 연도 - 보험료율 {9}%",
+        marker="x",
+    )
+    plt.title("소득대체율에 따른 적자 전환 및 기금 소진 연도")
+    plt.xlabel("소득대체율 (%)")
+    plt.ylabel("연도")
+    plt.yticks(
+        np.arange(
+            min(data["first_deficit_year"].min(), data["depletion_year"].min()),
+            max(data["first_deficit_year"].max(), data["depletion_year"].max()) + 1,
+            2,
+        )
+    )
+    plt.legend(loc="best")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig("images/lineplot_deficit_depletion_by_income_replacement.png")
+    plt.close()
+
+    # 3. 3D 서피스 플롯: 최대적립금
+    fig = plt.figure(figsize=(12, 8))
+    ax = fig.add_subplot(111, projection="3d")
+    X = df["contribution_rate"].unique()
+    Y = df["income_replacement"].unique()
+    X, Y = np.meshgrid(X, Y)
+    Z = df.pivot(
+        index="income_replacement", columns="contribution_rate", values="max_reserve"
+    ).values
+    surf = ax.plot_surface(X, Y, Z, cmap="viridis")
+    plt.colorbar(surf)
+    ax.set_xlabel("Contribution Rate (%)")
+    ax.set_ylabel("Income Replacement Rate (%)")
+    ax.set_zlabel("Maximum Reserve (trillion won)")
+    plt.title("Maximum Reserve Fund - 3D View")
+    plt.tight_layout()
+    plt.savefig("images/3d_surface_max_reserve.png")
+    plt.close()
+
+    # 4. 산점도: 최대적립금과 기금소진연도의 관계
+    plt.figure(figsize=(10, 6))
+    scatter = plt.scatter(
+        df["max_reserve"],
+        df["depletion_year"],
+        c=df["contribution_rate"],
+        cmap="viridis",
+    )
+    plt.colorbar(scatter, label="Contribution Rate (%)")
+    plt.title("Maximum Reserve vs Depletion Year")
+    plt.xlabel("Maximum Reserve (trillion won)")
+    plt.ylabel("Depletion Year")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig("images/scatter_reserve_depletion.png")
+    plt.close()
+
+
+if __name__ == "__main__":
+    df = pd.read_csv("csv/simulation_results_20250202_220713.csv")
+    create_simulation_visualizations(df)
