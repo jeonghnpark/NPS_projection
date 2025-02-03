@@ -47,7 +47,7 @@ jh70035@gmail.com<br>
 
 #### 2. 연도별 수입-지출 현황
 ![수입-지출 결과](./images/nps_revenue_expenditure.png)
-
+- 2042년 기금 적자 전환환
 #### 3. GDP대비 급여지출
 ![인구추계 결과](./images/nps_gdp_expenditure.png)
 
@@ -56,6 +56,13 @@ jh70035@gmail.com<br>
 ![인구구조 변화 결과](./images/nps_demographic_indicators.png)
 - 총인구 및 생산가능인구 감소 추세
 - 노년부양비는 지속적으로 증가하여 2070년 124%에 이릅니다.
+
+#### 4.1 인구 피라미드
+![인구 피라미드](./images/population_pyramid_2023.png)
+- 2023년 기준 인구구조를 보여주는 인구 피라미드
+- 40-50대가 가장 많은 인구 구조
+- 저출산으로 인한 0-17세 인구의 급격한 감소
+- 65세 이상 고령인구의 증가 추세
 
 
 #### 5. 민감도 분석
