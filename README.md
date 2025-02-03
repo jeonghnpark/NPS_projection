@@ -47,7 +47,7 @@ jh70035@gmail.com<br>
 
 #### 2. 연도별 수입-지출 현황
 ![수입-지출 결과](./images/nps_revenue_expenditure.png)
-- 2042년 기금 적자 전환환
+- 2042년 기금 적자 전환
 #### 3. GDP대비 급여지출
 ![인구추계 결과](./images/nps_gdp_expenditure.png)
 
