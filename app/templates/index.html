@@ -55,9 +55,17 @@
     </div>
 
     <div class="results-section">
-        <div id="loading" style="display: none;">계산 중...</div>
-        <img id="plot-image" style="display: none;">
-        <div id="results-text" class="results-text"></div>
+        <div id="loading" style="display: none;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <div class="loading-text" style="font-size: 1.1em;">계산 중입니다. 음... 속도 느려 터지니 인내심을 가지고 기다려주세요. </div>
+                <img src="/static/images/amazon2.png" style="height: 50px; object-fit: contain;">
+
+            </div>
+        </div>
+
+    </div>
+    <img id="plot-image" src="/static/images/default.png" style="display: block;">
+    <div id="results-text" class="results-text"></div>
     </div>
 
     <script>
@@ -65,10 +73,9 @@
             const loading = document.getElementById('loading');
             const plotImage = document.getElementById('plot-image');
             const resultsText = document.getElementById('results-text');
-
+            resultsText.innerHTML = '';
             loading.style.display = 'block';
             plotImage.style.display = 'none';
-            resultsText.innerHTML = '';
 
             const formData = new FormData();
             formData.append('contribution_rate', document.getElementById('contribution-rate').value);
@@ -82,12 +89,22 @@
                 const data = await response.json();
 
                 if (data.success) {
+                    resultsText.innerHTML = `
+                            <ul style="list-style-type: none; padding: 0;">
+                                <li style="margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+                                    <span style="font-weight: bold;">최대 적립금:</span> ${data.max_reserve.toFixed(1)}조원
+                                </li>
+                                <li style="margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+                                    <span style="font-weight: bold;">적자전환 연도:</span> ${data.deficit_year}년
+                                </li>
+                                <li style="margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+                                    <span style="font-weight: bold;">기금 소진 연도:</span> ${data.depletion_year}년
+                                </li>
+                            </ul>
+                        `;
                     plotImage.src = `data:image/png;base64,${data.image}`;
                     plotImage.style.display = 'block';
-                    resultsText.innerHTML = `
-                        <p>최대 적립금: ${data.max_reserve.toFixed(1)}조원</p>
-                        <p>기금 소진 연도: ${data.depletion_year}년</p>
-                    `;
+
                 } else {
                     resultsText.innerHTML = `오류 발생: ${data.error}`;
                 }

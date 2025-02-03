@@ -291,21 +291,21 @@ def run_multiple_simulations():
 
 
 if __name__ == "__main__":
-    result = run_pension_simulation(0.09, 0.40)
+    result = run_pension_simulation(0.20, 0.40)
     sensitivity = result["sensitivity"]
-
-    # 보험료율 1% 증가 시 최대적립금 변화율
-    cont_vs_res = sensitivity["contribution_elasticity"]["max_reserve"]
-    print(
-        f"보험료율 1% 증가시 최대적립금 {'+' if cont_vs_res>0 else '-'}{abs(cont_vs_res)}조 변화"
-    )
-    # 보험료율 1% 증가 시 기금소진연도 변화율
-    cont_vs_dep = sensitivity["contribution_elasticity"]["depletion_year"]
-    print(
-        f"보험료율 1% 증가시 기금소진연도 {'+' if cont_vs_dep>0 else '-'}{abs(cont_vs_dep)}년 변화"
-    )
-    # 소득대체율 1% 증가 시 기금소진연도 변화율
-    rep_vs_dep = sensitivity["replacement_elasticity"]["depletion_year"]
-    print(
-        f"소득대체율 1% 증가시 기금소진연도 {'+' if rep_vs_dep>0 else '-'}{abs(rep_vs_dep)}년 변화"
-    )
+    print(sensitivity)
+    # # 보험료율 1% 증가 시 최대적립금 변화율
+    # cont_vs_res = sensitivity["contribution_elasticity"]["max_reserve"]
+    # print(
+    #     f"보험료율 1% 증가시 최대적립금 {'+' if cont_vs_res>0 else '-'}{abs(cont_vs_res)}조 변화"
+    # )
+    # # 보험료율 1% 증가 시 기금소진연도 변화율
+    # cont_vs_dep = sensitivity["contribution_elasticity"]["depletion_year"]
+    # print(
+    #     f"보험료율 1% 증가시 기금소진연도 {'+' if cont_vs_dep>0 else '-'}{abs(cont_vs_dep)}년 변화"
+    # )
+    # # 소득대체율 1% 증가 시 기금소진연도 변화율
+    # rep_vs_dep = sensitivity["replacement_elasticity"]["depletion_year"]
+    # print(
+    #     f"소득대체율 1% 증가시 기금소진연도 {'+' if rep_vs_dep>0 else '-'}{abs(rep_vs_dep)}년 변화"
+    # )

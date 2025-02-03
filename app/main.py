@@ -46,18 +46,26 @@ async def calculate(
         max_reserve = reserve_funds[max_reserve_idx]
 
         # 적자전환 시점 찾기 (전년대비 감소 시작점)
-        deficit_idx = next(
-            i
-            for i in range(1, len(reserve_funds))
-            if reserve_funds[i] < reserve_funds[i - 1]
-        )
-        deficit_year = years[deficit_idx]
+        try:
+            deficit_idx = next(
+                i
+                for i in range(1, len(reserve_funds))
+                if reserve_funds[i] < reserve_funds[i - 1]
+            )
+            deficit_year = years[deficit_idx]
+        except StopIteration:
+            # 적자전환이 발생하지 않는 경우
+            deficit_idx = None
+            deficit_year = None
 
         # 기금 고갈 시점 찾기
-        depletion_idx = next(
-            (i for i, x in enumerate(reserve_funds) if x <= 0), len(years) - 1
-        )
-        depletion_year = years[depletion_idx]
+        try:
+            depletion_idx = next(i for i, x in enumerate(reserve_funds) if x <= 0)
+            depletion_year = years[depletion_idx]
+        except StopIteration:
+            # 고갈시점이 없는 경우
+            depletion_idx = None
+            depletion_year = None
 
         plt.plot(years, reserve_funds, marker="o")
 
@@ -74,30 +82,32 @@ async def calculate(
         )
 
         # 적자전환 시점 표시
-        plt.annotate(
-            f"적자전환\n{deficit_year}년",
-            xy=(deficit_year, reserve_funds[deficit_idx]),
-            xytext=(-10, -30),
-            textcoords="offset points",
-            ha="right",
-            va="top",
-            bbox=dict(boxstyle="round,pad=0.5", fc="orange", alpha=0.5),
-            arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=0"),
-        )
+        if deficit_year is not None and deficit_idx is not None:
+            plt.annotate(
+                f"적자전환\n{deficit_year}년",
+                xy=(deficit_year, reserve_funds[deficit_idx]),
+                xytext=(-10, -30),
+                textcoords="offset points",
+                ha="right",
+                va="top",
+                bbox=dict(boxstyle="round,pad=0.5", fc="orange", alpha=0.5),
+                arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=0"),
+            )
 
         # 기금 고갈 시점 표시
-        plt.annotate(
-            f"기금고갈\n{depletion_year}년",
-            xy=(depletion_year, 0),
-            xytext=(10, -30),
-            textcoords="offset points",
-            ha="left",
-            va="top",
-            bbox=dict(boxstyle="round,pad=0.5", fc="red", alpha=0.5),
-            arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=0"),
-        )
+        if depletion_year is not None:
+            plt.annotate(
+                f"기금고갈\n{depletion_year}년",
+                xy=(depletion_year, 0),
+                xytext=(10, -30),
+                textcoords="offset points",
+                ha="left",
+                va="top",
+                bbox=dict(boxstyle="round,pad=0.5", fc="red", alpha=0.5),
+                arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=0"),
+            )
 
-        plt.title("연도별 적립금 추이")
+        plt.title("연도별 적립금 추이", loc="left")
         plt.xlabel("연도")
         plt.ylabel("적립금 (조원)")
         plt.grid(True)
@@ -113,13 +123,9 @@ async def calculate(
             {
                 "success": True,
                 "image": img_base64,
-                "max_reserve": max(reserve_funds),
-                "depletion_year": years[
-                    next(
-                        (i for i, x in enumerate(reserve_funds) if x <= 0),
-                        len(years) - 1,
-                    )
-                ],
+                "max_reserve": max_reserve,
+                "depletion_year": depletion_year,
+                "deficit_year": deficit_year,
             }
         )
 
