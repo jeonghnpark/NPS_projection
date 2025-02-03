@@ -1,3 +1,4 @@
+from nps_common import NPSCommon
 from demographic_module import DemographicModule
 from economic_module import EconomicModule
 from finance_module import FinanceModule, SubscriberModule, BenefitModule
@@ -35,12 +36,13 @@ class NationalPensionModel:
         self.start_year = 2023  # 고정해야함 초기값등
         self.end_year = 2093
 
+        self.common = NPSCommon()
         # 주요 모듈 초기화
         self.demographic = DemographicModule()  # 인구모듈
         self.economic = EconomicModule()  # 경제모듈
-        self.subscriber = SubscriberModule()  # 가입자모듈
-        self.benefit = BenefitModule()  # 급여모듈
-        self.finance = FinanceModule()  # 재정모듈
+        self.subscriber = SubscriberModule(self.common)  # 가입자모듈
+        self.benefit = BenefitModule(self.common)  # 급여모듈
+        self.finance = FinanceModule(self.common)  # 재정모듈
 
     def run_projection(self):
         """재정추계 실행"""
@@ -90,10 +92,10 @@ class NationalPensionModel:
         }
 
 
-nps = NationalPensionModel()
-rs = nps.run_projection()
+if __name__ == "__main__":
+    nps = NationalPensionModel()
+    rs = nps.run_projection()
 
-
-save_results_to_csv(rs)
-create_financial_plots(rs)
-create_demographic_plots(rs)
+    save_results_to_csv(rs)
+    create_financial_plots(rs)
+    create_demographic_plots(rs)
