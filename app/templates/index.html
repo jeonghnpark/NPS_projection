@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>재정추계 미니 시뮬레이터 </title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .input-section {
+            margin: 20px 0;
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .results-section {
+            margin-top: 30px;
+        }
+
+        #plot-image {
+            max-width: 100%;
+            margin-top: 20px;
+        }
+
+        .results-text {
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>국민연금 재정추계 미니 시뮬레이터</h1>
+
+    <div class="input-section">
+        <div class="form-group">
+            <label for="contribution-rate">보험료율 (%)</label>
+            <input type="number" id="contribution-rate" min="1" max="30" step="0.1" value="9">
+        </div>
+
+        <div class="form-group">
+            <label for="income-replacement">소득대체율 (%)</label>
+            <input type="number" id="income-replacement" min="1" max="100" step="0.1" value="40">
+        </div>
+
+        <button onclick="calculate()">계산하기</button>
+    </div>
+
+    <div class="results-section">
+        <div id="loading" style="display: none;">계산 중...</div>
+        <img id="plot-image" style="display: none;">
+        <div id="results-text" class="results-text"></div>
+    </div>
+
+    <script>
+        async function calculate() {
+            const loading = document.getElementById('loading');
+            const plotImage = document.getElementById('plot-image');
+            const resultsText = document.getElementById('results-text');
+
+            loading.style.display = 'block';
+            plotImage.style.display = 'none';
+            resultsText.innerHTML = '';
+
+            const formData = new FormData();
+            formData.append('contribution_rate', document.getElementById('contribution-rate').value);
+            formData.append('income_replacement', document.getElementById('income-replacement').value);
+
+            try {
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    plotImage.src = `data:image/png;base64,${data.image}`;
+                    plotImage.style.display = 'block';
+                    resultsText.innerHTML = `
+                        <p>최대 적립금: ${data.max_reserve.toFixed(1)}조원</p>
+                        <p>기금 소진 연도: ${data.depletion_year}년</p>
+                    `;
+                } else {
+                    resultsText.innerHTML = `오류 발생: ${data.error}`;
+                }
+            } catch (error) {
+                resultsText.innerHTML = `오류 발생: ${error.message}`;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>
