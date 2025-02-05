@@ -128,11 +128,11 @@ class SubscriberModule:
     def __init__(self, common: NPSCommon):
         self.common = common
         self.params = {
-            "participation_rate": {  # 가입률
-                (18, 27): 0.50,  # 청년층
-                (28, 49): 0.80,  # 핵심근로층
-                (50, 59): 0.70,  # 준고령층
-                (60, 64): 0.40,  # 고령층
+            "participation_rate": {  # 가입률 -> 여성정책연구원 성인지 통계자료
+                (18, 27): 0.31,  # 청년층
+                (28, 49): 0.67,  # 핵심근로층
+                (50, 59): 0.75,  # 준고령층
+                (60, 64): 0.14,  # 고령층
             },
             "avg_income": {  # 연령대별 평균소득
                 (18, 27): 250,  # 월 250만원
@@ -163,14 +163,14 @@ class SubscriberModule:
                 & (population_structure["age"] <= age_group[1])
             ]["total"].sum()
 
-            # 가입자 수 계산
+            # 연령대 가입자 수
             subscribers[age_group] = age_pop * rate
 
             # 실질 소득 계산 (2023년 기준 실질가치)
             avg_income = self.params["avg_income"][age_group]
             total_income_real += subscribers[age_group] * avg_income * 12
 
-        # 모든 연령대의 실질소득 합계를 구한 후 명목가치로 변환
+        # 명목가치로 변환
         total_income_nominal = total_income_real * cumulative_inflation
 
         return {

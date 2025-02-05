@@ -34,7 +34,8 @@ async def calculate(
         results = model.run_projection()
         financial_results = results["financial_results"]
 
-        plt.figure(figsize=(10, 6))
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 12))
+
         years = [r["year"] for r in financial_results]
         reserve_funds = [
             r["nominal_reserve_fund"] / 100000000 for r in financial_results
@@ -67,10 +68,11 @@ async def calculate(
             depletion_idx = None
             depletion_year = None
 
-        plt.plot(years, reserve_funds, marker="o")
+        # 첫 번째 그래프 (적립금 추이)
+        ax1.plot(years, reserve_funds, marker="o")
 
         # 최대 적립금 표시
-        plt.annotate(
+        ax1.annotate(
             f"최대 적립금\n{max_reserve_year}년\n{max_reserve:.1f}조원",
             xy=(max_reserve_year, max_reserve),
             xytext=(10, 30),
@@ -83,7 +85,7 @@ async def calculate(
 
         # 적자전환 시점 표시
         if deficit_year is not None and deficit_idx is not None:
-            plt.annotate(
+            ax1.annotate(
                 f"적자전환\n{deficit_year}년",
                 xy=(deficit_year, reserve_funds[deficit_idx]),
                 xytext=(-10, -30),
@@ -96,7 +98,7 @@ async def calculate(
 
         # 기금 고갈 시점 표시
         if depletion_year is not None:
-            plt.annotate(
+            ax1.annotate(
                 f"기금고갈\n{depletion_year}년",
                 xy=(depletion_year, 0),
                 xytext=(10, -30),
@@ -107,10 +109,26 @@ async def calculate(
                 arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=0"),
             )
 
-        plt.title("연도별 적립금 추이", loc="left")
-        plt.xlabel("연도")
-        plt.ylabel("적립금 (조원)")
-        plt.grid(True)
+        ax1.set_title("연도별 적립금 추이", loc="left")
+        ax1.set_xlabel("연도")
+        ax1.set_ylabel("적립금 (조원)")
+        ax1.grid(True)
+
+        # 두 번째 그래프 (수입-지출 추이)
+        nominal_revenue = [r["nominal_revenue"] / 100000000 for r in financial_results]
+        nominal_expenditure = [
+            r["nominal_expenditure"] / 100000000 for r in financial_results
+        ]
+
+        ax2.plot(years, nominal_revenue, marker="o", label="총수입")
+        ax2.plot(years, nominal_expenditure, marker="o", label="총지출")
+        ax2.set_title("연도별 수입-지출 추이")
+        ax2.set_xlabel("연도")
+        ax2.set_ylabel("금액 (조원)")
+        ax2.legend()
+        ax2.grid(True)
+
+        plt.tight_layout()
 
         # 이미지를 바이트로 변환
         img_buf = io.BytesIO()
