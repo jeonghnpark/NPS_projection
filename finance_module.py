@@ -1,10 +1,12 @@
 # 재정모듈
 import pandas as pd
 import numpy as np
+from nps_common import NPSCommon
 
 
 class FinanceModule:
-    def __init__(self):
+    def __init__(self, common: NPSCommon):
+        self.common = common
         self.params = {
             "contribution_rate": 0.09,
             "nominal_investment_return": {
@@ -13,17 +15,6 @@ class FinanceModule:
                 2040: 0.046,
                 2050: 0.045,
                 2060: 0.045,
-            },
-            "inflation_rate": {
-                2023: 0.022,
-                2024: 0.022,
-                2025: 0.022,
-                2026: 0.022,
-                2027: 0.022,
-                2030: 0.022,
-                2040: 0.020,
-                2050: 0.020,
-                2060: 0.020,
             },
             "real_investment_return": {
                 2023: 0.025,
@@ -34,7 +25,7 @@ class FinanceModule:
             },
         }
 
-        self.reserve_fund = 915e8  # 2023년 초기 적립금 (915조원): 단위 만원
+        self.reserve_fund = 915e8  # 2023년 초기 명목 적립금 (915조원): 단위 만원
         self.real_reserve_fund = 915e8  # 2023년 초기 실질 적립금 (915조원): 단위 만원
 
     def project_balance(self, year, subscribers, benefits, economic_vars):
@@ -71,14 +62,6 @@ class FinanceModule:
             "nominal_gdp": economic_vars["nominal_gdp"],
             "real_gdp": economic_vars["real_gdp"],
         }
-
-    def _get_cumulative_inflation(self, base_year, target_year):
-        """기준연도 대비 목표연도까지의 누적 물가상승률 계산"""
-        cumulative = 1.0
-        for year in range(base_year + 1, target_year + 1):
-            inflation_rate = self._get_inflation_rate(year)
-            cumulative *= 1 + inflation_rate
-        return cumulative
 
     def _calculate_total_revenue(self, year, subscribers, economic_vars):
         """총수입 계산 (실질가치 기준)"""
@@ -135,25 +118,21 @@ class FinanceModule:
             return np.interp(year, years, rates)
 
     def _get_inflation_rate(self, year):
-        """특정 연도의 물가상승률 반환"""
-        years = sorted(self.params["inflation_rate"].keys())
-        rates = [self.params["inflation_rate"][y] for y in years]
+        return self.common.get_inflation_rate(year)
 
-        if year >= years[-1]:
-            return rates[-1]
-        else:
-            return np.interp(year, years, rates)
+    def _get_cumulative_inflation(self, base_year, target_year):
+        return self.common.get_cumulative_inflation(base_year, target_year)
 
 
 class SubscriberModule:
-    def __init__(self):
-        """가입자모듈 초기화"""
+    def __init__(self, common: NPSCommon):
+        self.common = common
         self.params = {
-            "participation_rate": {  # 가입률
-                (18, 27): 0.50,  # 청년층
-                (28, 49): 0.80,  # 핵심근로층
-                (50, 59): 0.70,  # 준고령층
-                (60, 64): 0.40,  # 고령층
+            "participation_rate": {  # 가입률 -> 여성정책연구원 성인지 통계자료
+                (18, 27): 0.31,  # 청년층
+                (28, 49): 0.67,  # 핵심근로층
+                (50, 59): 0.75,  # 준고령층
+                (60, 64): 0.14,  # 고령층
             },
             "avg_income": {  # 연령대별 평균소득
                 (18, 27): 250,  # 월 250만원
@@ -161,31 +140,12 @@ class SubscriberModule:
                 (50, 59): 380,
                 (60, 64): 300,
             },
-            "inflation_rate": {  # 물가상승률 (보고서 p.12 참조)
-                2023: 0.022,
-                2024: 0.022,
-                2025: 0.022,
-                2026: 0.022,
-                2027: 0.022,
-                2030: 0.022,
-                2040: 0.020,
-                2050: 0.020,
-                2060: 0.020,
-            },
         }
 
     def _get_inflation_rate(self, year):
-        """물가상승률 반환 (FinanceModule의 메서드 활용)"""
-        # FinanceModule의 inflation_rate 파라미터 사용
-        years = sorted(self.params["inflation_rate"].keys())
-        rates = [self.params["inflation_rate"][y] for y in years]
-
-        if year >= years[-1]:
-            return rates[-1]
-        return np.interp(year, years, rates)
+        return self.common.get_inflation_rate(year)
 
     def project_subscribers(self, year, population_structure):
-
         subscribers = {}
         total_income_real = 0
 
@@ -203,14 +163,14 @@ class SubscriberModule:
                 & (population_structure["age"] <= age_group[1])
             ]["total"].sum()
 
-            # 가입자 수 계산
+            # 연령대 가입자 수
             subscribers[age_group] = age_pop * rate
 
             # 실질 소득 계산 (2023년 기준 실질가치)
             avg_income = self.params["avg_income"][age_group]
             total_income_real += subscribers[age_group] * avg_income * 12
 
-        # 모든 연령대의 실질소득 합계를 구한 후 명목가치로 변환
+        # 명목가치로 변환
         total_income_nominal = total_income_real * cumulative_inflation
 
         return {
@@ -223,8 +183,8 @@ class SubscriberModule:
 
 
 class BenefitModule:
-    def __init__(self):
-
+    def __init__(self, common: NPSCommon):
+        self.common = common
         self.params = {
             "income_replacement": 0.40,  # 소득대체율 40%
             "avg_insured_period": {  # 평균가입기간
@@ -241,35 +201,13 @@ class BenefitModule:
                 2050: 0.750,
                 2060: 0.800,
             },
-            "inflation_rate": {  # 물가상승률 (보고서 p.12)
-                2023: 0.022,
-                2024: 0.022,
-                2025: 0.022,
-                2026: 0.022,
-                2027: 0.022,
-                2030: 0.022,
-                2040: 0.020,
-                2050: 0.020,
-                2060: 0.020,
-            },
         }
 
     def _get_inflation_rate(self, year):  # subscriber와 중복됨 개선필요
-
-        years = sorted(self.params["inflation_rate"].keys())
-        rates = [self.params["inflation_rate"][y] for y in years]
-
-        if year >= years[-1]:
-            return rates[-1]
-        return np.interp(year, years, rates)
+        return self.common.get_inflation_rate(year)
 
     def _get_cumulative_inflation(self, base_year, target_year):
-
-        cumulative = 1.0
-        for year in range(base_year + 1, target_year + 1):
-            inflation_rate = self._get_inflation_rate(year)
-            cumulative *= 1 + inflation_rate
-        return cumulative
+        return self.common.get_cumulative_inflation(base_year, target_year)
 
     def _get_benefit_rate(self, year):
 

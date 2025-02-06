@@ -1,5 +1,11 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+
+# 한글 폰트 설정
+plt.rcParams["font.family"] = "Malgun Gothic"  # 윈도우의 경우
+# plt.rcParams['font.family'] = 'AppleGothic'  # macOS의 경우
+plt.rcParams["axes.unicode_minus"] = False  # 마이너스 기호 깨짐 방지
 
 
 class DemographicModule:
@@ -265,13 +271,35 @@ def create_initial_population_2023():
     return pd.DataFrame(population_structure)
 
 
-# 사용 예시
+def save_pop_structure(df):
+    # 인구구조 시각화
+    plt.figure(figsize=(12, 6))
+
+    # 남성 인구는 음수로 표시
+    plt.barh(df["age"], -df["male"] / 10000, color="skyblue", alpha=0.7, label="남성")
+    # 여성 인구는 양수로 표시
+    plt.barh(df["age"], df["female"] / 10000, color="pink", alpha=0.7, label="여성")
+
+    plt.title("2023년 인구피라미드", fontsize=14)
+    plt.xlabel("인구 (만명)", fontsize=12)
+    plt.ylabel("연령", fontsize=12)
+
+    # x축 레이블을 절대값으로 표시
+    xticks = plt.xticks()[0]
+    plt.xticks(xticks, [abs(x) for x in xticks])
+
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    # 이미지 저장
+    plt.savefig("images/population_pyramid_2023.png", dpi=300, bbox_inches="tight")
+    plt.close()
+
+
 def test_demographic_module():
     demo = DemographicModule()
-
     demo.population_structure = create_initial_population_2023()
-
-    # 2023년부터 2093년까지 인구추계 테스트
+    # save_pop_structure(demo.population_structure)
     results_list = []
     for year in range(2023, 2094):
         result = demo.project_population(year)
@@ -284,9 +312,7 @@ def test_demographic_module():
                 ],
                 "elderly_population": result["indicators"]["elderly_population"],
                 "elderly_dependency": result["indicators"]["elderly_dependency"],
-                "population_structure": result[
-                    "population_structure"
-                ],  # 인구구조 데이터 추가
+                "population_structure": result["population_structure"],
             }
         )
 
