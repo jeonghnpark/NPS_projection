@@ -1,4 +1,5 @@
 from NPS_model import NationalPensionModel
+from visualization import create_simulation_visualizations
 import pandas as pd
 import numpy as np
 from datetime import datetime
@@ -183,25 +184,6 @@ def run_pension_simulation(contribution_rate, income_replacement, sensitivity=Tr
     return base_result
 
 
-def calculate_elasticity(base_value, changed_value, delta):
-    """
-    탄력성을 계산합니다.
-
-    Args:
-        base_value: 기준값
-        changed_value: 변화된 값
-        delta: 입력값의 변화량 (예: 0.01 = 1%)
-
-    Returns:
-        float: 탄력성 ((Δy/y)/(Δx/x))
-    """
-    if base_value is None or changed_value is None:
-        return None
-
-    percent_change = (changed_value - base_value) / base_value
-    return percent_change / delta
-
-
 # 사용 예시
 def test_simulation():
     """시뮬레이션 테스트 함수"""
@@ -251,10 +233,10 @@ def run_multiple_simulations():
         for inc_replace in income_replacements:
             # 시뮬레이션 실행
             print(
-                f"Running simulation for contribution rate: {cont_rate * 100}%, income replacement: {inc_replace * 100}%"
+                f"Running simulation for contribution rate: {cont_rate * 100:.0f}%, income replacement: {inc_replace * 100:.0f}%"
             )
 
-            result = run_pension_simulation(cont_rate, inc_replace)
+            result = run_pension_simulation(cont_rate, inc_replace, sensitivity=False)
             # 결과 저장
             results.append(
                 {
@@ -291,21 +273,8 @@ def run_multiple_simulations():
 
 
 if __name__ == "__main__":
-    result = run_pension_simulation(0.20, 0.40)
-    sensitivity = result["sensitivity"]
-    print(sensitivity)
-    # # 보험료율 1% 증가 시 최대적립금 변화율
-    # cont_vs_res = sensitivity["contribution_elasticity"]["max_reserve"]
-    # print(
-    #     f"보험료율 1% 증가시 최대적립금 {'+' if cont_vs_res>0 else '-'}{abs(cont_vs_res)}조 변화"
-    # )
-    # # 보험료율 1% 증가 시 기금소진연도 변화율
-    # cont_vs_dep = sensitivity["contribution_elasticity"]["depletion_year"]
-    # print(
-    #     f"보험료율 1% 증가시 기금소진연도 {'+' if cont_vs_dep>0 else '-'}{abs(cont_vs_dep)}년 변화"
-    # )
-    # # 소득대체율 1% 증가 시 기금소진연도 변화율
-    # rep_vs_dep = sensitivity["replacement_elasticity"]["depletion_year"]
-    # print(
-    #     f"소득대체율 1% 증가시 기금소진연도 {'+' if rep_vs_dep>0 else '-'}{abs(rep_vs_dep)}년 변화"
-    # )
+    # result = run_pension_simulation(0.09, 0.40)
+    df_result = run_multiple_simulations()
+    create_simulation_visualizations(df_result)
+    # sensitivity = result["sensitivity"]
+    # print(sensitivity)
