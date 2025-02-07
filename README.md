@@ -32,10 +32,11 @@ jh70035@gmail.com<br>
 - 재정수지 추계 (FinanceModule)
 
 ### 주요 결과
+- 제5차 재정추계 보고서와 같은 결과를 재현하였습니다.
 - 국민연금 적립금은 2038년 1,796조원으로 최고치에 도달한 후 지속적으로 감소하고 2055년 소진됩니다.
-- 수입보다 지출이 더 커지는 수지적자는 2038년부터 발생할 것으로 예측되었습니다. 
+- 수입보다 지출이 더 커지는 수지적자는 2039년부터 발생할 것으로 예측되었습니다. 
 - 노인부양비는 지속적으로 증가하여 2070년 124%에 이릅니다. 
-- 5차 재정계산 보고서 대비 최대 적립금액 차이를 제외하고  같은 결과를 재현하였습니다. 
+
 
 ### 주요 결과 그래프
 
@@ -100,6 +101,9 @@ jh70035@gmail.com<br>
 ## 참고문헌
 - 국민연금 제5차 재정계산 결과 (2023)
 https://nsp.nanet.go.kr/plan/subject/detail.do?nationalPlanControlNo=PLAN0000037347
+- 통계청 2023년 사망원인통계 (2023)
+- 고용노동부 근로자의 평균임금(성/사업체규모/연령별) 통계 (2024)
+- 통계청 총조사인구 성/연령별 통계 (2024)
 
 
 ## 향후 개선 계획 
@@ -128,6 +132,8 @@ https://nsp.nanet.go.kr/plan/subject/detail.do?nationalPlanControlNo=PLAN0000037
 
 
 ## 출력 결과
-모델은 두 가지 CSV 파일을 생성합니다:
-- `financial_results_실질_[timestamp].csv`: 재정추계 결과
-- `demographic_results_실질_[timestamp].csv`: 인구추계 결과
+모델은 다음 CSV 파일과 이미지 파일을 생성합니다:
+- `csv/financial_results_실질_[timestamp].csv`: 재정추계 결과
+- `csv/demographic_results_실질_[timestamp].csv`: 인구추계 결과
+- `images/data/nps_reserve_fund_[timestamp].png`: 연도별 누적 적립 기금
+- `images/data/nps_demographic_indicators_[timestamp].png`: 인구추계 결과
