@@ -202,7 +202,7 @@ def create_simulation_visualizations(df):
     plt.xlabel("Income Replacement Rate (%)")
     plt.ylabel("Contribution Rate (%)")
     plt.tight_layout()
-    plt.savefig("images/heatmap_max_reserve.png")
+    plt.savefig("images/data/heatmap_max_reserve.png")
     plt.close()
 
     # 2. 라인 플롯: 보험료율별 기금소진연도
@@ -221,7 +221,7 @@ def create_simulation_visualizations(df):
     plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig("images/lineplot_depletion.png")
+    plt.savefig("images/data/lineplot_depletion.png")
     plt.close()
 
     # 2. 라인 플롯: 보험료율 vs 기금적자연도, 기금소진연도
@@ -249,15 +249,15 @@ def create_simulation_visualizations(df):
             5,
         )
     )
-    plt.legend(loc="best")  # 그래프 안에 legend를 표시
+    plt.legend(loc="best")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig("images/lineplot_deficit_depletion_by_contribution.png")
+    plt.savefig("images/data/lineplot_deficit_depletion_by_contribution.png")
     plt.close()
 
     # 2. 라인 플롯: 소득대체율 vs 기금적자연도, 기금 소진연도
     plt.figure(figsize=(12, 6))
-    data = df[df["contribution_rate"] == 9]  # 시각화를 위한 고정된 보험료율 가정
+    data = df[df["contribution_rate"] == 9]
     plt.plot(
         data["income_replacement"],
         data["first_deficit_year"],
@@ -283,7 +283,7 @@ def create_simulation_visualizations(df):
     plt.legend(loc="best")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig("images/lineplot_deficit_depletion_by_income_replacement.png")
+    plt.savefig("images/data/lineplot_deficit_depletion_by_income_replacement.png")
     plt.close()
 
     # 3. 3D 서피스 플롯: 최대적립금
@@ -302,7 +302,7 @@ def create_simulation_visualizations(df):
     ax.set_zlabel("Maximum Reserve (trillion won)")
     plt.title("Maximum Reserve Fund - 3D View")
     plt.tight_layout()
-    plt.savefig("images/3d_surface_max_reserve.png")
+    plt.savefig("images/data/3d_surface_max_reserve.png")
     plt.close()
 
     # 4. 산점도: 최대적립금과 기금소진연도의 관계
@@ -319,7 +319,7 @@ def create_simulation_visualizations(df):
     plt.ylabel("Depletion Year")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig("images/scatter_reserve_depletion.png")
+    plt.savefig("images/data/scatter_reserve_depletion.png")
     plt.close()
 
 

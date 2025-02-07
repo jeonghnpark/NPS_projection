@@ -9,9 +9,7 @@ timestamp = now.strftime("%d%H%M")
 
 
 def run_single_simulation(contribution_rate, income_replacement):
-    """
-    단일 시뮬레이션을 실행합니다.
-    """
+
     # 모델 초기화
     model = NationalPensionModel()
 
@@ -76,17 +74,7 @@ def run_single_simulation(contribution_rate, income_replacement):
 
 
 def run_pension_simulation(contribution_rate, income_replacement, sensitivity=True):
-    """
-    보험료율과 소득대체율에 따른 연금 재정 시뮬레이션을 실행합니다.
 
-    Args:
-        contribution_rate (float): 보험료율 (예: 0.09 = 9%)
-        income_replacement (float): 소득대체율 (예: 0.40 = 40%)
-        sensitivity (bool): 민감도 분석 수행 여부
-
-    Returns:
-        dict: 시뮬레이션 결과 및 민감도 분석 결과
-    """
     # 기본 시뮬레이션 실행
     base_result = run_single_simulation(contribution_rate, income_replacement)
     print(
@@ -207,18 +195,7 @@ def test_simulation():
 
 
 def run_multiple_simulations():
-    """
-    다양한 보험료율과 소득대체율 조합에 대한 시뮬레이션을 실행합니다.
 
-    Returns:
-        pd.DataFrame: 시뮬레이션 결과
-            - contribution_rate: 보험료율 (%)
-            - income_replacement: 소득대체율 (%)
-            - max_reserve: 최대 적립금 (조원)
-            - max_reserve_year: 최대 적립금 도달 연도
-            - first_deficit_year: 최초 수지적자 발생 연도
-            - depletion_year: 기금 소진 연도
-    """
     # 시뮬레이션할 보험료율과 소득대체율 조합
     contribution_rates = [
         round(x, 2) for x in np.arange(0.07, 0.16, 0.01)
@@ -267,14 +244,10 @@ def run_multiple_simulations():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     csv_filename = f"csv/simulation_results_{timestamp}.csv"
     df_results.to_csv(csv_filename, index=False)
-    print(f"\n결과가 {csv_filename}에 저장되었습니다.")
 
     return df_results
 
 
 if __name__ == "__main__":
-    # result = run_pension_simulation(0.09, 0.40)
     df_result = run_multiple_simulations()
     create_simulation_visualizations(df_result)
-    # sensitivity = result["sensitivity"]
-    # print(sensitivity)

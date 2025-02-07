@@ -108,32 +108,30 @@ https://nsp.nanet.go.kr/plan/subject/detail.do?nationalPlanControlNo=PLAN0000037
 
 ## 향후 개선 계획 
 
-### 단기 개선사항
+### 개선사항
 - 최근 금리 상승을 반영한 재정추계 재계산
   - 국제 경제상황 변동 반영
   - 금리 민감도 분석
 
 ### 중장기 개선사항
-- 모델 안정성 검증
-  - 백테스트 
-  - 스트레스 테스트
 - 확률론적 시뮬레이션 (Monte Carlo Simulation)
+  - 기금정책이 외부 충격변수에 대해서 기금 안정성을 담보할 수 있는지 여부
 - 상관관계 모델링을 통한 동적 최적화 (최적 보험률과 소득대체율 탐색)
 
 
+
 ## 실행 방법
-### 1. 모델 실행(기본가정)
-- 전체 모델: `python NPS_model.py`
-### 2. 민감도 실행
-- 민감도 : `python simulation.py`
-
-### 3. 시각화 실행
-- 시각화: `python visualization.py`
-
+### 1. 단일 모델 실행(기본가정)
+- 기본가정 모델: `python NPS_model.py`
+### 2. 시나리오 분석과 시각화
+- 시나리오 분석석 : `python simulation.py`
 
 ## 출력 결과
 모델은 다음 CSV 파일과 이미지 파일을 생성합니다:
 - `csv/financial_results_실질_[timestamp].csv`: 재정추계 결과
 - `csv/demographic_results_실질_[timestamp].csv`: 인구추계 결과
+- `csv/simulation_results_[timestamp].csv` : 시뮬레이션 결과 
 - `images/data/nps_reserve_fund_[timestamp].png`: 연도별 누적 적립 기금
 - `images/data/nps_demographic_indicators_[timestamp].png`: 인구추계 결과
+- `images/lineplot_xxxx.png`: 각종 시뮬레이션 결과 시각화
+
